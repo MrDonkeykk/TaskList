@@ -14,19 +14,6 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from . import login_manager
-
-
-class Role(db.Model):
-    """用户类型"""
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    users = db.relationship('User', backref='role')
-
-    def __repr__(self):
-        return '<Role % r>' % self.name
-
-
 """
 Flask-Login 提供了一个 UserMixin 类,包含常用方法的默认实现,且能满足大多数需求。
 1). is_authenticated  用户是否已经登录?  
@@ -48,9 +35,23 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))  # 加密的密码
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    # 电子邮件地址email,相对于用户名而言,用户更不容易忘记自己的电子邮件地址。
     email = db.Column(db.String(64), unique=True, index=True)
     confirmed = db.Column(db.Boolean, default=False)
+    # 新添加的用户资料
+    name = db.Column(db.String(64))
+    # 用户的真实姓名
+    location = db.Column(db.String(64))  # 所在地
+    about_me = db.Column(db.Text())  # 自我介绍
+    # 注册日期
+    # default 参数可以接受函数作为默认值,
+    # 所以每次生成默认值时,db.Column() 都会调用指定的函数。
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    # 最后访问日期
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    # 1). Category添加一个属性todos, 2). Todo添加属性category;
+    todos = db.relationship('Todo', backref='user')
+    categories = db.relationship('Category', backref='user')
 
     def generate_confirmation_token(self, expiration=3600):
         """生成一个令牌,有效期默认为一小时。"""
