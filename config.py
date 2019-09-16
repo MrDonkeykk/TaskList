@@ -1,12 +1,3 @@
-# encoding=utf-8
-"""
-Date:2019-09-08 17:13
-User:LiYu
-Email:liyu_5498@163.com
-
-"""
-import os
-
 """
 存储配置;
 """
@@ -37,12 +28,15 @@ class DevelopmentConfig(Config):
    """
     # 启用了调试支持,服务器会在代码修改后自动重新载入,并在发生错误时提供一个相当有用的调试器。
     DEBUG = True
-    MAIL_SERVER = 'smtp.qq.com'
-    MAIL_PORT = 587
+    MAIL_SERVER = 'smtp.163.com'
+    # 指定端口， 默认25， 但qq邮箱默认为 端口号465或587；
+    MAIL_PORT = 25
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or '976131979'
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or '密码'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'liyu_5498'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'wangyi5498'
+    # 数据库地址
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:westos@localhost/TaskList'
 
 
 class TestingConfig(Config):

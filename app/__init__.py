@@ -10,9 +10,17 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from app.auth import auth
 from config import config
-from app.todo import todo
+from flask_login import LoginManager
+# Python2使用MySQLdb，Python3使用pymysql，有些模块没有更新
+import pymysql
+pymysql.install_as_MySQLdb()
+
+login_manager = LoginManager()
+# session_protection 属性提供不同的安全等级防止用户会话遭篡改。
+login_manager.session_protection = 'strong'
+# login_view 属性设置登录页面的端点。
+login_manager.login_view = 'auth.login'
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -31,8 +39,11 @@ def create_app(config_name='development'):
     db.init_app(app)
 
     # url_prefix: 指定访问该蓝图中定义的视图函数时需要添加的前缀, 没有指定则不加;
+    from app.auth import auth  # auth的views里导入了db，放在上面的时候，db还没有创建，会报错
     app.register_blueprint(auth, url_prefix='/auth')
+    from app.todo import todo
     app.register_blueprint(todo, url_prefix='/todo')  # 注册蓝本
-    # 附加路由和自定义的错误页面
-    # .........后续还需完善, 补充视图和错误页面
+    from app.user import user
+    app.register_blueprint(user, url_prefix='/user')
+    login_manager.init_app(app)  # 用户认证新加扩展
     return app
